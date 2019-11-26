@@ -1,10 +1,16 @@
 # Purpose
 
-This module provides symbolic definitions and helpers for the Texas Instruments [ADS111x](https://www.ti.com/lit/ds/symlink/ads1115.pdf) I2c Δ-Σ analog-to-digital converters (ADS1113, ADS1114, ADS1115)
+This NPM module provides symbolic definitions and helpers for the Texas Instruments [ADS111x](https://www.ti.com/lit/ds/symlink/ads1115.pdf) I2c Δ-Σ analog-to-digital converters (ADS1113, ADS1114, ADS1115)
+
+IT should be noted that this package has been entirely written in ESM (EcmaScript Modules) of extension `.mjs`: exports are not written in deprecated [CommonJS](https://en.wikipedia.org/wiki/CommonJS) syntax 
+
+## Installation
+
+ `npm install --save @labzdjee/ads1115-config` 
 
 # API in Brief
 
-This API is written in modular ECMAScript and exports two objects: `addresses` and `configReg` 
+This API is written in modular ECMAScript and exports two objects: `addresses` and `configReg`  (and no default)
 
 Object `addresses` exports the following functions:
 
