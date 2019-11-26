@@ -2,7 +2,7 @@
   "name": "@labzdjee/ads1115-config",
   "version": "1.0.0",
   "description": "symbolic definitions for ADS1115 delta-sigma Analog-Digital-Converter",
-  "main": "ads1115-config.js",
+  "main": "ads1115-config.mjs",
   "scripts": {
     "test": "mjs-mocha"
   },
