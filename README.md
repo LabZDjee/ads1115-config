@@ -26,6 +26,7 @@ Object `configReg` exports the following entities, related to the definition of 
 - `buildConfigRegister`: a function which takes a *configuration object* and returns two bytes to be serialized
 - `splitAsValues`: a function which takes two bytes representing a configuration register as read on the I2c bus and returns a *configuration object* with values in a *numeric* form 
 - `splitAsSymbols`: a function which takes two bytes representing a configuration register as read on the I2c bus and returns a *configuration object* with values in a *symbolic* form 
+- alterObject`: a function which takes a list of *symbols* and alters a *configuration object*
 
 # Export: `addresses`
 
@@ -213,7 +214,7 @@ Data associated to this fields can be *numeric values* or *symbols* even mixed
 
 ### Check for Validity of a Configuration Object
 
-A method tests whether a *configuration object* is valid, as defined above:  `configReg.checkConfigurationObject`
+`configReg.checkConfigurationObject`: a method which tests whether a *configuration object* is valid, as defined above
 
 This method activity depends on what type of parameter is passed on:
 
@@ -241,7 +242,7 @@ Note: all values are set to their default as stated in the component datasheet a
 
 ### `configReg.build`
 
-This function takes a *configuration object*, builds and returns a configuration register: `configReg.build(configObject, strict)`
+This method takes a *configuration object*, builds and returns a configuration register: `configReg.build(configObject, strict)`
 
 Parameter `strict` will verify whether `configObject` is valid. If not `build` throws an exception with a string which points out what is the (first) problem
 
@@ -251,10 +252,25 @@ Returned value is a configuration register, which is an object which consists of
 
 ### `configReg.splitAsValues`
 
-This is one of the two reciprocal functions to `build`: it takes a configuration register of form `{ highByte, lowByte }` and returns a full *configuration object* whose fields are populated with *numeric* values
+This is one of the two reciprocal methods to `build`: it takes a configuration register of form `{ highByte, lowByte }` and returns a full *configuration object* whose fields are populated with *numeric* values
 
 In case, `highByte` is not given a default value, corresponding to the default value for the high byte of the configuration register. Same for `lowByte` with default value of the low byte
 
 ### `configReg.splitAsSymbols`
 
-Same as previous function except it populates result values with *symbols*
+Same as previous method except it populates result values with *symbols*
+
+### `configReg.alterObject`
+
+This method takes advantage of the fact there is no similar *symbol* among all the configuration *fields*. So, providing a list of symbols in an array allows this function to figure out which *field* this *symbol* belongs to and alters a *configuration object* accordingly
+
+Parameters:
+
+1. `listOfSymbols`: an array with a list of *symbols*. If not provided, it's a convenient way to clone the *default configuration object*
+2. `originObject`: a valid *configuration object* which be cloned before `listOfSymbols` is applied upon it. If not provided, the *default configuration object* is taken instead
+
+Exceptions:
+
+- If `listOfSymbols` is not an array or if this array contains a not recognized *symbol*, then it throws an error
+- if `originObject` is not a valid *configuration object*, it throws an error
+

@@ -1,6 +1,6 @@
 /* jshint esversion: 9 */
 
-import { strictEqual, ok, deepEqual } from "assert";
+import { strictEqual, ok, deepEqual, notStrictEqual } from "assert";
 import chai from "chai";
 
 const expect = chai.expect;
@@ -281,6 +281,104 @@ describe("ads111x configuration register export", function() {
         normalizeConfigObjectAsSymbols(fullObject);
         deepEqual(fullObject, configReg.splitAsSymbols(testVector.registerValue));
       });
+    });
+  });
+  describe("test configReg.alterObject", function() {
+    const alterObject = configReg.alterObject;
+    describe("normal cases", function() {
+      [
+        {
+          startConversion: "startConversion",
+          inputMultiplexer: "in2gnd",
+          programmableGainAmplifier: "0.512",
+          operatingMode: "singleShot",
+          dataRate: "128SPS",
+          comparatorMode: "window",
+          comparatorPolarity: "activeLow",
+          comparatorLatching: "nonLatching",
+          comparatorQueue: "disabled",
+        },
+        {
+          startConversion: "doNothing",
+          inputMultiplexer: "in2in3",
+          programmableGainAmplifier: "0.256",
+          operatingMode: "singleShot",
+          dataRate: "475SPS",
+        },
+        {
+          startConversion: "startConversion",
+          programmableGainAmplifier: "1.024",
+          dataRate: "860SPS",
+          comparatorMode: "traditional",
+          comparatorLatching: "latching",
+        },
+        configReg.defaultConfiguration,
+        {},
+        { inputMultiplexer: "in2gnd" },
+        { inputMultiplexer: "in3gnd" },
+        { inputMultiplexer: "in0gnd" },
+        {
+          startConversion: "doNothing",
+          inputMultiplexer: "in1gnd",
+          programmableGainAmplifier: "6.144",
+          dataRate: "8SPS",
+          comparatorMode: "window",
+          comparatorPolarity: "activeHigh",
+          comparatorQueue: "disabled",
+        },
+      ].forEach(function(object, index, arr) {
+        const refObject = Object.assign({}, arr[(index + 1) % arr.length]);
+        const expectedResult = Object.assign({}, refObject);
+        let array = [];
+        for (const field in object) {
+          array.push(object[field]);
+          expectedResult[field] = object[field];
+        }
+        it(`should alter correctly [${array}]:`, function() {
+          const result = alterObject(array, refObject);
+          strictEqual(result, refObject);
+          deepEqual(expectedResult, result);
+        });
+      });
+    });
+    describe("special cases", function() {
+      const testArray = [null, 2.78, 0, false, "hello"];
+      testArray.forEach(function(p) {
+        function test() {
+          alterObject(p, configReg.defaultConfiguration);
+        }
+        it(`should throw because listOfSymbols as '${p}' is not an array: `, function() {
+          expect(test).to.throw("listOfSymbols: expect an array");
+        });
+      });
+      testArray.forEach(function(p) {
+        function test() {
+          alterObject(["doNothing", p], configReg.defaultConfiguration);
+        }
+        it(`should throw if listOfSymbols '${p}' inside of array is not a valid symbol: `, function() {
+          expect(test).to.throw(/alterConfigurationObject: '.+' not found/);
+        });
+      });
+      it("should throw if originObject is not not a  valid field: ", function() {
+        function test() {
+          alterObject(["2.048"], { hello: "hello" });
+        }
+        expect(test).to.throw("alterConfigurationObject: originObject: is not a configuration object");
+      });
+    });
+  });
+  describe("test cloneDefaultObject", function() {
+    const cloneDefaultObject = configReg.cloneDefaultObject;
+    const defaultConfiguration = configReg.defaultConfiguration;
+    it("should return a different reference to that of default configuration object: ", function() {
+      notStrictEqual(cloneDefaultObject(), defaultConfiguration);
+    });
+    it("should return an object contents identical to default configuration object: ", function() {
+      deepEqual(cloneDefaultObject(), defaultConfiguration);
+    });
+    const referenceTestObject = { one: 1, two: 2, three: 3, four: 4 };
+    it("should return an object contents identical to passed object: ", function() {
+      deepEqual(cloneDefaultObject(referenceTestObject), referenceTestObject);
     });
   });
 });

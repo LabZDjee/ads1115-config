@@ -205,6 +205,41 @@ function checkConfigurationObject(parameter) {
   return true;
 }
 
+function alterConfigurationObject(listOfSymbols, originObject) {
+  if (checkConfigurationObject({ configurationObject: originObject, checkValuesAlso: true }) !== true) {
+    throw new Error("alterConfigurationObject: originObject: is not a configuration object");
+  }
+  if (Array.isArray(listOfSymbols) === false) {
+    throw new Error("alterConfigurationObject: listOfSymbols: expect an array");
+  }
+  listOfSymbols.forEach(function(symbol) {
+    let notFound = true;
+    for (let field of Object.keys(configRegMaps)) {
+      for (let symbolCandidate of Object.keys(configRegMaps[field])) {
+        if (symbol === symbolCandidate) {
+          originObject[field] = symbolCandidate;
+          notFound = false;
+          break;
+        }
+      }
+      if (notFound === false) {
+        break;
+      }
+    }
+    if (notFound) {
+      throw new Error(`alterConfigurationObject: '${symbol}' not found`);
+    }
+  });
+  return originObject;
+}
+
+function cloneDefaultObject(originObject) {
+  if (originObject === undefined) {
+    originObject = defaultConfiguration;
+  }
+  return Object.assign({}, originObject);
+}
+
 function buildConfigRegister(configurationObject, strict) {
   let lowByte = 0;
   let highByte = 0;
@@ -309,7 +344,9 @@ const configReg = {
   maps: configRegMaps,
   symbolFromValueFunctions: configRegSymbolFromValueFunctions,
   defaultConfiguration,
+  cloneDefaultObject,
   checkObject: checkConfigurationObject,
+  alterObject: alterConfigurationObject,
   build: buildConfigRegister,
   splitAsValues: splitConfigRegisterAsValues,
   splitAsSymbols: splitConfigRegisterAsSymbols,
