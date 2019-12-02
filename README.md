@@ -274,3 +274,7 @@ Exceptions:
 - If `listOfSymbols` is not an array or if this array contains a not recognized *symbol*, then it throws an error
 - if `originObject` is not a valid *configuration object*, it throws an error
 
+### `configReg.cloneDefaultObject`
+
+As it names implies this method returns a clone of *default configuration object*. Anyhow if a parameter is passed, it is supposed to be *any* object to clone instead
+

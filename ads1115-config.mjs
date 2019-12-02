@@ -4,7 +4,7 @@
 // build an object made of reciprocal (value, key)
 function reciprocalObject(inObject) {
   const outObject = {};
-  for (let k of Object.keys(inObject)) {
+  for (const k of Object.keys(inObject)) {
     outObject[inObject[k]] = k;
   }
   return outObject;
@@ -182,13 +182,13 @@ function checkConfigurationObject(parameter) {
   } else {
     configurationObject = parameter;
   }
-  for (let k of Object.keys(configurationObject)) {
+  for (const k in configurationObject) {
     if (configRegMaps[k] === undefined) {
       return { field: k };
     }
   }
   if (checkValuesAlso) {
-    for (let k of Object.keys(configurationObject)) {
+    for (const k in configurationObject) {
       const v = configurationObject[k];
       const error = { field: k, value: v };
       if (typeof v === "number") {
@@ -214,8 +214,8 @@ function alterConfigurationObject(listOfSymbols, originObject) {
   }
   listOfSymbols.forEach(function(symbol) {
     let notFound = true;
-    for (let field of Object.keys(configRegMaps)) {
-      for (let symbolCandidate of Object.keys(configRegMaps[field])) {
+    for (const field in configRegMaps) {
+      for (const symbolCandidate in configRegMaps[field]) {
         if (symbol === symbolCandidate) {
           originObject[field] = symbolCandidate;
           notFound = false;
@@ -304,7 +304,7 @@ function splitConfigRegisterAsValues(hlBytes) {
 function splitConfigRegisterAsSymbols(hlBytes) {
   const asInts = splitConfigRegisterAsValues(hlBytes);
   let result = {};
-  for (let field of Object.keys(asInts)) {
+  for (const field in asInts) {
     const numVal = asInts[field];
     result[field] = configRegSymbolFromValueFunctions[field](numVal);
   }
