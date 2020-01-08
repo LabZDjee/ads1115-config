@@ -5,7 +5,7 @@ import chai from "chai";
 
 const expect = chai.expect;
 
-import { addresses, configReg } from "./ads1115-config.mjs";
+import { addresses, configReg, numeric } from "./ads1115-config.mjs";
 
 const configurationRegisterBasicChecks = {
   startConversion: ["doNothing", "startConversion"],
@@ -136,6 +136,7 @@ function normalizeConfigObjectAsSymbols(cfgObj) {
   }
 }
 
+///////////////////////////
 describe("ads111x 'addresses' export", function() {
   const setSlaveAddress = addresses.setSlaveAddress;
   const setPointerRegister = addresses.setPointerRegister;
@@ -192,6 +193,7 @@ describe("ads111x 'addresses' export", function() {
     });
   });
 });
+//////////////////////////////
 describe("ads111x configuration register export", function() {
   const cMaps = configReg.maps;
   const valueToSymbol = configReg.symbolFromValueFunctions;
@@ -379,6 +381,55 @@ describe("ads111x configuration register export", function() {
     const referenceTestObject = { one: 1, two: 2, three: 3, four: 4 };
     it("should return an object contents identical to passed object: ", function() {
       deepEqual(cloneDefaultObject(referenceTestObject), referenceTestObject);
+    });
+  });
+});
+///////////////////////////////////////
+describe("ads111x numeric utility export", function() {
+  describe("test iirLowPassFilter", function() {
+    const f = { filteredValue: null, takeInPerCent: 0 };
+    it("should follow external calculations for a simple 1st order IIR filter:", function() {
+      let expected;
+      for (let s = 2; s < 100; s += 2) {
+        if (expected === undefined) {
+          expected = s;
+        }
+        const b = s / 100;
+        const a = 1 - b;
+        f.takeInPerCent = 100 * b;
+        for (let i = 0; i < 20; i++) {
+          expected = a * expected + b * s; // formula of IIR low pass (first order)
+          strictEqual(Math.fround(numeric.iirLowPassFilter(s, f)), Math.fround(expected));
+        }
+      }
+    });
+  });
+  describe("test twoBytes2SignedInt16", function() {
+    it("should work in the positive realm:", function() {
+      let r = 0;
+      for (let h = 0; h < 128; h++) {
+        for (let l = 0; l < 256; l++) {
+          strictEqual(numeric.twoBytes2SignedInt16([h, l]), r);
+          r++;
+        }
+      }
+    });
+    it("should work in the negative realm as well:", function() {
+      let r = -1;
+      for (let h = 255; h > 127; h--) {
+        for (let l = 255; l >= 0; l--) {
+          strictEqual(numeric.twoBytes2SignedInt16([h, l]), r);
+          r--;
+        }
+      }
+    });
+  });
+  describe("test twoBytes2UnsignedInt15", function() {
+    it("should convert to value itself from 0 up to 32,767 and return 0 above:", function() {
+      for (let w = 0; w < 65536; w++) {
+        const arr = [Math.floor(w / 256), w % 256];
+        strictEqual(numeric.twoBytes2UnsignedInt15(arr), w > 32767 ? 0 : w);
+      }
     });
   });
 });

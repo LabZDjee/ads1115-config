@@ -26,7 +26,13 @@ Object `configReg` exports the following entities, related to the definition of 
 - `buildConfigRegister`: a function which takes a *configuration object* and returns two bytes to be serialized
 - `splitAsValues`: a function which takes two bytes representing a configuration register as read on the I2c bus and returns a *configuration object* with values in a *numeric* form 
 - `splitAsSymbols`: a function which takes two bytes representing a configuration register as read on the I2c bus and returns a *configuration object* with values in a *symbolic* form 
-- alterObject`: a function which takes a list of *symbols* and alters a *configuration object*
+- `alterObject`: a function which takes a list of *symbols* and alters a *configuration object*
+
+Object `numeric` exports some math functions useful for getting numerical values from the two bytes a conversion is made of:
+
+- `twoBytes2SignedInt16`: from two bytes, returns a signed 16-bit value
+- `twoBytes2UnsignedInt15`: from two bytes, returns an unsigned 15-bit value (negative values truncated to zero)
+- `iirLowPassFilter`: a low-pass first-order IIR ([Infinite Impulse Response](https://en.wikipedia.org/wiki/Infinite_impulse_response)) filter
 
 # Export: `addresses`
 
@@ -208,7 +214,7 @@ Config register field: **COMP_QUE**
 
 ## Concept of Configuration Object
 
-A valid *configuration object* can *only* contain any of the following keys know as *fields* (which described above): `startConversion`,  `inputMultiplexer`, `programmableGainAmplifier`, `operatingMode`, `dataRate`, `comparatorMode`, `comparatorPolarity`, `comparatorLatching`, `comparatorQueue`
+A valid *configuration object* can *only* contain any of the following keys known as *fields* (which are described above): `startConversion`,  `inputMultiplexer`, `programmableGainAmplifier`, `operatingMode`, `dataRate`, `comparatorMode`, `comparatorPolarity`, `comparatorLatching`, `comparatorQueue`
 
 Data associated to this fields can be *numeric values* or *symbols* even mixed
 
@@ -278,3 +284,21 @@ Exceptions:
 
 As it names implies this method returns a clone of *default configuration object*. Anyhow if a parameter is passed, it is supposed to be *any* object to clone instead
 
+# Export: `numeric`
+
+## Function `twoBytes2SignedInt16`
+
+Takes an array of two bytes and returns a value in the [-32,768; 32,767] range
+
+## Function `twoBytes2UnsignedInt15`
+
+Takes an array of two bytes and returns a value in the [0; 32,767] range. All negative values are trimmed to zero. This function is useful in case of unipolar conversions as noise easily introduces negative values near zero
+
+## Function `iirLowPassFilter`
+
+Takes two parameters: a new input value and an object with two keys:
+
+- `takeInPerCent`: this is the value in percent ]0; 99[ of the share of the new value which is taken for feeding the filter, the higher this value the more quickly the filter output reflects the input
+- `filteredValue`: storage of the filter output, should be initially `null`
+
+This function returns the filtered value

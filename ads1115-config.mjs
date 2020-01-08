@@ -340,6 +340,37 @@ function setSlaveAddress(addrPin, forReading) {
   return 0x90 + addrPin * 2 + (forReading ? 1 : 0);
 }
 
+/*
+ * First order IIR low pass filter
+ *  value = A * inputValue + B * previousValue
+ * updates a target object which consists of two fields:
+ *  filteredValue (expected to be 'null', intially, or of course an initial value if such desired)
+ *  takeInPerCent (between 0 and 100, which is B*100, implying A = (100 - takeInPerCent) / 100)
+ * return: filtered value
+ */
+function iirLowPassFilter(newValue, target) {
+  if (target.filteredValue === null) {
+    target.filteredValue = newValue;
+  } else {
+    target.filteredValue =
+      ((100 - target.takeInPerCent) * target.filteredValue + target.takeInPerCent * newValue) / 100;
+  }
+  return target.filteredValue;
+}
+
+// takes first two bytes of an array and returns the equivalent value as a signed short int (16 bits)
+function twoBytes2SignedInt16(array) {
+  const word = array[0] * 256 + array[1];
+  return word - (word > 32767 ? 65536 : 0);
+}
+
+// takes first two bytes of an array and returns the equivalent value as a signed short int with
+// negative values clamped to zero
+function twoBytes2UnsignedInt15(array) {
+  const hiByte = array[0];
+  return (hiByte & 0x80) === 0x80 ? 0 : hiByte * 256 + array[1];
+}
+
 const configReg = {
   maps: configRegMaps,
   symbolFromValueFunctions: configRegSymbolFromValueFunctions,
@@ -357,4 +388,10 @@ const addresses = {
   setPointerRegister,
 };
 
-export { addresses, configReg };
+const numeric = {
+  twoBytes2SignedInt16,
+  twoBytes2UnsignedInt15,
+  iirLowPassFilter,
+};
+
+export { addresses, configReg, numeric };
