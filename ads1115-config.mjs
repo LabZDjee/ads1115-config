@@ -15,6 +15,7 @@ const startConversionMap = {
   startConversion: 1,
 };
 let startConversionMapToSymbol;
+
 function getStartConversionTokenFromValue(val) {
   if (startConversionMapToSymbol === undefined) {
     startConversionMapToSymbol = reciprocalObject(startConversionMap);
@@ -33,6 +34,7 @@ const inputMultiplexerMap = {
   in3gnd: 7,
 };
 let inputMultiplexerMapToSymbol;
+
 function getInputMultiplexerTokenFromValue(val) {
   if (inputMultiplexerMapToSymbol === undefined) {
     inputMultiplexerMapToSymbol = reciprocalObject(inputMultiplexerMap);
@@ -51,6 +53,7 @@ const programmableGainAmplifierMap = {
   "0.256_3": 7,
 };
 let programmableGainAmplifierMapToSymbol;
+
 function getProgrammableGainTokenFromValue(val) {
   if (programmableGainAmplifierMapToSymbol === undefined) {
     programmableGainAmplifierMapToSymbol = reciprocalObject(programmableGainAmplifierMap);
@@ -63,6 +66,7 @@ const operatingModeMap = {
   singleShot: 1,
 };
 let operatingModeMapToSymbol;
+
 function getOperatingModesTokenFromValue(val) {
   if (operatingModeMapToSymbol === undefined) {
     operatingModeMapToSymbol = reciprocalObject(operatingModeMap);
@@ -81,6 +85,7 @@ const dataRateMap = {
   "860SPS": 7,
 };
 let dataRateMapToSymbol;
+
 function getDataRateTokenFromValue(val) {
   if (dataRateMapToSymbol === undefined) {
     dataRateMapToSymbol = reciprocalObject(dataRateMap);
@@ -93,6 +98,7 @@ const comparatorModeMap = {
   window: 1,
 };
 let comparatorModeMapToSymbol;
+
 function getComparatorModeTokenFromValue(val) {
   if (comparatorModeMapToSymbol === undefined) {
     comparatorModeMapToSymbol = reciprocalObject(comparatorModeMap);
@@ -105,6 +111,7 @@ const comparatorPolarityMap = {
   activeHigh: 1,
 };
 let comparatorPolarityMapToSymbol;
+
 function getComparatorPolarityTokenFromValue(val) {
   if (comparatorPolarityMapToSymbol === undefined) {
     comparatorPolarityMapToSymbol = reciprocalObject(comparatorPolarityMap);
@@ -117,6 +124,7 @@ const comparatorLatchingMap = {
   latching: 1,
 };
 let comparatorLatchingMapToSymbol;
+
 function getComparatorLatchingTokenFromValue(val) {
   if (comparatorLatchingMapToSymbol === undefined) {
     comparatorLatchingMapToSymbol = reciprocalObject(comparatorLatchingMap);
@@ -131,6 +139,7 @@ const comparatorQueueMap = {
   disabled: 3,
 };
 let comparatorQueueMapToSymbol;
+
 function getComparatorQueueTokenFromValue(val) {
   if (comparatorQueueMapToSymbol === undefined) {
     comparatorQueueMapToSymbol = reciprocalObject(comparatorQueueMap);
@@ -184,13 +193,18 @@ function checkConfigurationObject(parameter) {
   }
   for (const k in configurationObject) {
     if (configRegMaps[k] === undefined) {
-      return { field: k };
+      return {
+        field: k
+      };
     }
   }
   if (checkValuesAlso) {
     for (const k in configurationObject) {
       const v = configurationObject[k];
-      const error = { field: k, value: v };
+      const error = {
+        field: k,
+        value: v
+      };
       if (typeof v === "number") {
         if (configRegSymbolFromValueFunctions[k](v) === undefined) {
           return error;
@@ -206,13 +220,16 @@ function checkConfigurationObject(parameter) {
 }
 
 function alterConfigurationObject(listOfSymbols, originObject) {
-  if (checkConfigurationObject({ configurationObject: originObject, checkValuesAlso: true }) !== true) {
+  if (checkConfigurationObject({
+      configurationObject: originObject,
+      checkValuesAlso: true
+    }) !== true) {
     throw new Error("alterConfigurationObject: originObject: is not a configuration object");
   }
   if (Array.isArray(listOfSymbols) === false) {
     throw new Error("alterConfigurationObject: listOfSymbols: expect an array");
   }
-  listOfSymbols.forEach(function(symbol) {
+  listOfSymbols.forEach(function (symbol) {
     let notFound = true;
     for (const field in configRegMaps) {
       for (const symbolCandidate in configRegMaps[field]) {
@@ -243,6 +260,7 @@ function cloneDefaultObject(originObject) {
 function buildConfigRegister(configurationObject, strict) {
   let lowByte = 0;
   let highByte = 0;
+
   function getValue(key, shifts, width) {
     let result;
     const val = configurationObject[key];
@@ -256,12 +274,15 @@ function buildConfigRegister(configurationObject, strict) {
     return (result & ((1 << width) - 1)) << shifts;
   }
   if (strict) {
-    const check = checkConfigurationObject({ configurationObject, checkValues: true });
+    const check = checkConfigurationObject({
+      configurationObject,
+      checkValues: true
+    });
     if (check !== true) {
       const errorDetails =
-        check.value === undefined
-          ? `wrong field: '${check.field}'`
-          : `wrong value for field '${check.field}': '${check.value}'`;
+        check.value === undefined ?
+        `wrong field: '${check.field}'` :
+        `wrong value for field '${check.field}': '${check.value}'`;
       throw new Error(`ads1115-config:buildConfigRegister: invalid object: ${errorDetails}`);
     }
   }
@@ -274,12 +295,19 @@ function buildConfigRegister(configurationObject, strict) {
   lowByte |= getValue("comparatorPolarity", 3, 1);
   lowByte |= getValue("comparatorLatching", 2, 1);
   lowByte |= getValue("comparatorQueue", 0, 2);
-  return { highByte, lowByte };
+  return {
+    highByte,
+    lowByte
+  };
 }
 
 function splitConfigRegisterAsValues(hlBytes) {
-  let { highByte, lowByte } = hlBytes;
+  let {
+    highByte,
+    lowByte
+  } = hlBytes;
   let result = {};
+
   function extractBits(value, shift, width) {
     return (value >> shift) & ((1 << width) - 1);
   }
@@ -344,7 +372,7 @@ function setSlaveAddress(addrPin, forReading) {
  * First order IIR low pass filter
  *  value = A * inputValue + B * previousValue
  * updates a target object which consists of two fields:
- *  filteredValue (expected to be 'null', intially, or of course an initial value if such desired)
+ *  filteredValue (expected to be 'null', initially, or of course an initial value if such desired)
  *  takeInPerCent (between 0 and 100, which is B*100, implying A = (100 - takeInPerCent) / 100)
  * return: filtered value
  */
@@ -394,4 +422,8 @@ const numeric = {
   iirLowPassFilter,
 };
 
-export { addresses, configReg, numeric };
+export {
+  addresses,
+  configReg,
+  numeric
+};
