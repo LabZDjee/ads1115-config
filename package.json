@@ -1,6 +1,6 @@
 {
   "name": "@labzdjee/ads1115-config",
-  "version": "1.4.2",
+  "version": "1.4.4",
   "description": "symbolic definitions for ADS1115 delta-sigma Analog-Digital-Converter",
   "main": "ads1115-config.mjs",
   "scripts": {
@@ -8,9 +8,22 @@
   },
   "author": "Gerard Gauthier",
   "license": "MIT",
-  "homepage": "https://github.com/LabZDjee/ads1115-config",
+  "homepage": "https://github.com/LabZDjee/ads1115-config#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/LabZDjee/ads1115-config"
+  },
   "devDependencies": {
     "chai": "^4.2.0",
     "mjs-mocha": "^3.0.0"
-  }
+  },
+  "keywords": [
+    "ads1115",
+    "ads1113",
+    "ads1114",
+    "ADC",
+    "analogToDigitalConverter",
+    "deltaSigma",
+    "configuration"
+  ]
 }
