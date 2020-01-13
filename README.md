@@ -1,8 +1,8 @@
 # Purpose
 
-This NPM module provides symbolic definitions and helpers for the Texas Instruments [ADS111x](https://www.ti.com/lit/ds/symlink/ads1115.pdf) I2c Δ-Σ analog-to-digital converters (ADS1113, ADS1114, ADS1115)
+This NPM module main (and almost only purpose) is to provide *symbolic* definitions and helpers for the Texas Instruments [ADS111x](https://www.ti.com/lit/ds/symlink/ads1115.pdf) I2c Δ-Σ analog-to-digital converters (ADS1113, ADS1114, ADS1115)
 
-IT should be noted that this package has been entirely written in ESM (EcmaScript Modules) of extension `.mjs`: exports are not written in deprecated [CommonJS](https://en.wikipedia.org/wiki/CommonJS) syntax
+It should be noted that this package has been entirely written in ESM (EcmaScript Modules) of extension `.mjs`: exports are not written in deprecated [CommonJS](https://en.wikipedia.org/wiki/CommonJS) syntax
 
 ## Installation
 
@@ -23,7 +23,7 @@ Object `configReg` exports the following entities, related to the definition of 
 - `symbolFromValueFunctions`: a low level object which contains a set of functions which essentially is essentially the reciprocal of `maps`. Example: `configReg.inputMultiplexer(4)` gives `"in0gnd"`
 - `checkObject`: a function which verifies if an object is a _configuration object_, that is an object with only configuration fields as keys
 - `defaultConfiguration`: default _configuration object_
-- `buildConfigRegister`: a function which takes a _configuration object_ and returns two bytes to be serialized
+- `build`: a function which takes a _configuration object_ and returns two bytes to be serialized
 - `splitAsValues`: a function which takes two bytes representing a configuration register as read on the I2c bus and returns a _configuration object_ with values in a _numeric_ form
 - `splitAsSymbols`: a function which takes two bytes representing a configuration register as read on the I2c bus and returns a _configuration object_ with values in a _symbolic_ form
 - `alterObject`: a function which takes a list of _symbols_ and alters a _configuration object_
@@ -81,12 +81,12 @@ Map key / field name: `startConversion`
 
 Config register field: **OS**
 
-| symbol            | role                                                                                                                             | value |
-| ----------------- | -------------------------------------------------------------------------------------------------------------------------------- | ----- |
-| `doNothing`       | When writing: do nothing. When reading: device is currently performing a conversion                                              | 0     |
-| `startConversion` | When writing: start a single conversion, when in power-down state, When reading: device is not currently performing a conversion | 1     |
+| symbol            | role                                                         | value |
+| ----------------- | ------------------------------------------------------------ | ----- |
+| `doNothing`       | When writing: do nothing. When reading: device is currently performing a conversion | 0     |
+| `startConversion` | When writing: start a single conversion, when in power-down state. When reading: device is not currently performing a conversion | 1     |
 
-Note: as described above, this field has a different meaning when read or written. It has been arbitrary chosen to associate a symbol meaningful when writing. It should be remembered upon reading that `doNothing` means a conversion in under way and `startConversion` means no conversion is currently performed
+Note: as described above, this field has a different meaning when read or written. It has been arbitrary chosen to associate a symbol meaningful when writing. It should be remembered upon *reading* that `doNothing` means a conversion in under way and `startConversion` means no conversion is currently performed
 
 ### Input Multiplexer Configuration
 
