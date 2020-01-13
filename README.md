@@ -270,6 +270,8 @@ Same as previous method except it populates result values with _symbols_
 
 This method takes advantage of the fact there is no similar _symbol_ among all the configuration _fields_. So, providing a list of symbols in an array allows this function to figure out which _field_ this _symbol_ belongs to and alters a _configuration object_ accordingly
 
+Returned value is the altered *configuration object*
+
 Parameters:
 
 1. `listOfSymbols`: an array with a list of _symbols_. If not provided, it's a convenient way to clone the _default configuration object_
